@@ -9,29 +9,27 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class CrearHttp {
-    //String url = "https://v6.exchangerate-api.com/v6/" + apiKey + "/latest/" + baseCurrency;
+    private final String apiKey = "27204570bdc0f115f1a3e034";
 
-    HttpClient client = HttpClient.newHttpClient();
-    HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://v6.exchangerate-api.com/v6/27204570bdc0f115f1a3e034/latest/USD"))
+    public JsonObject obtenerTasas() {
+        String url = "https://v6.exchangerate-api.com/v6/27204570bdc0f115f1a3e034/latest/USD";
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
             .GET()
             .build();
 
-    {
         try {
             HttpResponse<String> response = client
                     .send(request, HttpResponse.BodyHandlers.ofString());
+            //System.out.println("RESPUESTA API" + response.body());
             JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
 
-            JsonObject monedasjson = json.getAsJsonObject("conversion_rates");
-            for( String key : monedasjson.keySet()){
-                System.out.println(key + ": " + monedasjson.get(key) );
-            }
-            String valor = monedasjson.get("USD").getAsString();
-            System.out.println("Aca es nombre: " + valor);
-
-        } catch (Exception e) {
-            throw new RuntimeException("No puedo converetir ese valor.");
+            return json.getAsJsonObject("conversion_rates");
+        }catch (Exception e){
+            throw new RuntimeException("Error al obtener las tasas de la Api: " + e.getMessage(), e);
         }
+
     }
 }
